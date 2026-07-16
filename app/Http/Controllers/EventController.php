@@ -83,22 +83,19 @@ class EventController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // Удаляем старую картинку, если она есть
             if ($event->image) {
                 Storage::disk('public')->delete($event->image_path);
             }
-            
+
             $path = $request->file('image')->store('events', 'public');
             $validated['image'] = ltrim($path, '/');
         } else {
-            // Если картинка не загружалась, убираем ключ image из массива, 
-            // чтобы не затереть старую картинку в базе данных
-            unset($validated['image']);
+            $validated['image'] = $event->image;
         }
 
         $event->update($validated);
 
-        return redirect()->route('event.show', $event->id)->with('success', 'Мероприятие сохранено');
+        return redirect()->route('event.show', $event->id)->with('success', 'Мероприятие обновлено!');
     }
 
     public function image($path)
