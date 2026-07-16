@@ -16,7 +16,8 @@ class EventController extends Controller
     public function index(Request $request)
     {
         $query = trim((string) $request->input('q', ''));
-        $dateFilter = $request->input('date_filter', 'all');
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
         $sort = $request->input('sort', 'date');
         $selectedTags = array_values(array_filter(array_map('trim', (array) $request->input('tags', []))));
 
@@ -35,10 +36,12 @@ class EventController extends Controller
                 }
             });
 
-        if ($dateFilter === 'upcoming') {
-            $eventsQuery->where('date', '>=', now());
-        } elseif ($dateFilter === 'past') {
-            $eventsQuery->where('date', '<', now());
+        if ($dateFrom) {
+            $eventsQuery->where('date', '>=', $dateFrom . ' 00:00:00');
+        }
+
+        if ($dateTo) {
+            $eventsQuery->where('date', '<=', $dateTo . ' 23:59:59');
         }
 
         if ($sort === 'popular') {
@@ -49,7 +52,7 @@ class EventController extends Controller
 
         $events = $eventsQuery->get();
 
-        return view('pages.event_index', compact('events', 'query', 'dateFilter', 'sort', 'selectedTags'))
+        return view('pages.events.event_index', compact('events', 'query', 'dateFrom', 'dateTo', 'sort', 'selectedTags'))
             ->with('availableTags', EventTag::options())
             ->with('tags', $selectedTags);
     }
@@ -58,7 +61,8 @@ class EventController extends Controller
         public function start(Request $request)
     {
         $query = trim((string) $request->input('q', ''));
-        $dateFilter = $request->input('date_filter', 'all');
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
         $sort = $request->input('sort', 'date');
         $selectedTags = array_values(array_filter(array_map('trim', (array) $request->input('tags', []))));
 
@@ -77,10 +81,12 @@ class EventController extends Controller
                 }
             });
 
-        if ($dateFilter === 'upcoming') {
-            $eventsQuery->where('date', '>=', now());
-        } elseif ($dateFilter === 'past') {
-            $eventsQuery->where('date', '<', now());
+        if ($dateFrom) {
+            $eventsQuery->where('date', '>=', $dateFrom . ' 00:00:00');
+        }
+
+        if ($dateTo) {
+            $eventsQuery->where('date', '<=', $dateTo . ' 23:59:59');
         }
 
         if ($sort === 'popular') {
@@ -106,7 +112,7 @@ class EventController extends Controller
             ];
         })->values();
 
-        return view('pages.start', compact('events', 'query', 'dateFilter', 'sort', 'selectedTags', 'mapMarkers'))
+        return view('pages.start', compact('events', 'query', 'dateFrom', 'dateTo', 'sort', 'selectedTags', 'mapMarkers'))
             ->with('availableTags', EventTag::options())
             ->with('tags', $selectedTags);
     }
@@ -121,7 +127,7 @@ class EventController extends Controller
             abort(403);
         }
 
-        return view('pages.event_create')->with('availableTags', EventTag::options());
+        return view('pages.events.event_create')->with('availableTags', EventTag::options());
     }
 
     /**
@@ -173,7 +179,7 @@ class EventController extends Controller
     public function show($id)
     {
         $event = Event::findOrFail($id);
-        return view('pages.event_show', compact('event'));
+        return view('pages.events.event_show', compact('event'));
     }
 
     /**
@@ -187,7 +193,7 @@ class EventController extends Controller
             abort(403);
         }
 
-        return view('pages.event_edit', compact('event'))->with('availableTags', EventTag::options());
+        return view('pages.events.event_edit', compact('event'))->with('availableTags', EventTag::options());
     }
 
     /**
@@ -257,7 +263,7 @@ class EventController extends Controller
             abort(403);
         }
 
-        return view('pages.event_delete', compact('event'));
+        return view('pages.events.event_delete', compact('event'));
     }
 
 

@@ -17,7 +17,7 @@
         <div class="footer-column">
             <h3 class="footer-title">Разделы</h3>
             <ul class="footer-links">
-                <li><a href="{{ route('articles') }}">Статьи</a></li>
+                <li><a href="{{ route('articles.index') }}">Статьи</a></li>
                 <li><a href="{{ route('event.index') }}">Мероприятия</a></li>
                 <li><a href="{{ route('club.index') }}">Клубы</a></li>
             </ul>
@@ -28,6 +28,7 @@
             <ul class="footer-links">
                 <li><a href="{{ route('author.faq') }}">Для авторов</a></li>
                 <li><a href="{{ route('club.faq') }}">Для клубов</a></li>
+                <li><a href="{{ route('contacts') }}">Контакты</a></li>
             </ul>
         </div>
         

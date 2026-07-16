@@ -63,7 +63,15 @@ document.addEventListener('DOMContentLoaded', function () {
         maxZoom: 19
     }).addTo(map);
 
-    const marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+    const markerIcon = L.divIcon({
+        className: 'custom-marker',
+        html: '🕮',
+        iconSize: [42, 42],
+        iconAnchor: [21, 42],
+        popupAnchor: [0, -42]
+    });
+
+    const marker = L.marker([defaultLat, defaultLng], { icon: markerIcon, draggable: true }).addTo(map);
     const placeInput = document.getElementById('place-input');
     const latInput = document.getElementById('latitude');
     const lngInput = document.getElementById('longitude');

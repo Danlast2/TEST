@@ -69,7 +69,15 @@
                 maxZoom: 19
             }).addTo(map);
 
-            L.marker([lat, lng]).addTo(map)
+            const markerIcon = L.divIcon({
+                className: 'custom-marker',
+                html: '📍',
+                iconSize: [42, 42],
+                iconAnchor: [21, 42],
+                popupAnchor: [0, -42]
+            });
+
+            L.marker([lat, lng], { icon: markerIcon }).addTo(map)
                 .bindPopup('{{ addslashes($exchange->place) }}')
                 .openPopup();
         });

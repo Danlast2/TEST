@@ -52,10 +52,58 @@ class EventIndexTest extends TestCase
 
         $this->actingAs($club);
 
-        $response = $this->get('/event-index?q=книжная&date_filter=upcoming&sort=popular&tag=discussion');
+        $response = $this->get('/event-index?q=книжная&date_from=' . now()->toDateString() . '&date_to=' . now()->addDays(2)->toDateString() . '&sort=popular&tags[]=discussion');
 
         $response->assertOk();
         $response->assertSee('Книжная встреча');
         $response->assertDontSee('Лекция по литературе');
+    }
+
+    public function test_event_index_can_filter_events_by_date_range(): void
+    {
+        $club = User::create([
+            'username' => 'Клуб2',
+            'email' => 'club2@example.com',
+            'password' => 'password',
+            'role' => 'club',
+        ]);
+
+        Event::create([
+            'title' => 'Мероприятие в диапазоне',
+            'date' => now()->addDays(3)->toDateTimeString(),
+            'place' => 'Казань',
+            'description' => 'Подходит по диапазону',
+            'min_entries' => 0,
+            'max_entries' => 10,
+            'image' => 'events/test3.jpg',
+            'latitude' => 55.7887,
+            'longitude' => 49.1221,
+            'tags' => ['discussion'],
+            'club_id' => $club->id,
+            'author_id' => $club->id,
+        ]);
+
+        Event::create([
+            'title' => 'Мероприятие вне диапазона',
+            'date' => now()->addDays(10)->toDateTimeString(),
+            'place' => 'Москва',
+            'description' => 'Не подходит по диапазону',
+            'min_entries' => 0,
+            'max_entries' => 10,
+            'image' => 'events/test4.jpg',
+            'latitude' => 55.7558,
+            'longitude' => 37.6173,
+            'tags' => ['lecture'],
+            'club_id' => $club->id,
+            'author_id' => $club->id,
+        ]);
+
+        $this->actingAs($club);
+
+        $response = $this->get('/event-index?date_from=' . now()->addDays(2)->toDateString() . '&date_to=' . now()->addDays(5)->toDateString());
+
+        $response->assertOk();
+        $response->assertSee('Мероприятие в диапазоне');
+        $response->assertDontSee('Мероприятие вне диапазона');
     }
 }

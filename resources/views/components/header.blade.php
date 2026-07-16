@@ -6,7 +6,7 @@
             <a href="{{ route('start') }}">Главная</a>
             <a href="{{ route('event.index') }}">Мероприятия</a>
             <a href="{{ route('club.index') }}">Клубы</a>
-            <a href="{{ route('articles') }}">Статьи</a>
+            <a href="{{ route('articles.index') }}">Статьи</a>
             <a href="{{ route('exchange.index') }}">Обмен</a>
 
             @guest

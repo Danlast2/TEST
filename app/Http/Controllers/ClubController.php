@@ -25,7 +25,7 @@ class ClubController extends Controller
             ->orderBy('username')
             ->get();
 
-        return view('pages.club_index', compact('clubs', 'query'));
+        return view('pages.clubs.club_index', compact('clubs', 'query'));
     }
 
     public function profile(Request $request, $id)
@@ -57,7 +57,7 @@ class ClubController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        return view('pages.club_profile', compact('club', 'members', 'events', 'query'));
+        return view('pages.clubs.club_profile', compact('club', 'members', 'events', 'query'));
     }
 
     public function join($id)
@@ -103,7 +103,7 @@ class ClubController extends Controller
             abort(403);
         }
 
-        return view('pages.club_edit', compact('club'));
+        return view('pages.clubs.club_edit', compact('club'));
     }
 
     public function updateProfile(Request $request, $id)

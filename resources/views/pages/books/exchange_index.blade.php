@@ -1,37 +1,40 @@
 @extends('template.app')
 
 @section('page')
-<section class="form-card">
-    <h2>Обмен книгами</h2>
-
-    <div class="flex" style="justify-content: space-between; align-items: center;">
-        <h3>Объявления</h3>
-        <a href="{{ route('exchange.create') }}" class="btn btn-primary">Выложить объявление</a>
-    </div>
-
-    <div class="object-grid">
-        @forelse($exchanges as $exchange)
-            <div class="card">
-                <div class="card-content">
-                    <h3 class="card-title">{{ $exchange->title }}</h3>
-                    <p>{{ Str::limit($exchange->description, 120) }}</p>
-                    <p><strong>Место:</strong> {{ $exchange->place }}</p>
-                    <p><strong>Статус:</strong> {{ $exchange->status === 'booked' ? 'Забронировано' : 'Активно' }}</p>
-                    <a href="{{ route('exchange.show', $exchange->id) }}" class="btn btn-outline">Подробнее</a>
-                </div>
+<div class="container" style="margin-bottom: 60px;">
+    <div class="page-shell">
+        <div class="page-header">
+            <div>
+                <h2 class="section-title" style="margin: 0 0 8px;">Обмен книгами</h2>
+                <p class="page-subtitle">Ищите активные объявления и смотрите их на карте.</p>
             </div>
-        @empty
-            <p>Пока нет объявлений.</p>
-        @endforelse
-    </div>
+            <a href="{{ route('exchange.create') }}" class="btn btn-primary">Выложить объявление</a>
+        </div>
 
-    <div class="container-map" style="margin-top: 24px;">
-        <div class="map-section">
-            <h3 class="section-title" style="margin-bottom: 15px;">Карта объявлений</h3>
-            <div id="exchange-map" class="map-container"></div>
+        <div class="object-grid">
+            @forelse($exchanges as $exchange)
+                <div class="card">
+                    <div class="card-content">
+                        <h3 class="card-title">{{ $exchange->title }}</h3>
+                        <p>{{ Str::limit($exchange->description, 120) }}</p>
+                        <p><strong>Место:</strong> {{ $exchange->place }}</p>
+                        <p><strong>Статус:</strong> {{ $exchange->status === 'booked' ? 'Забронировано' : 'Активно' }}</p>
+                        <a href="{{ route('exchange.show', $exchange->id) }}" class="btn btn-outline">Подробнее</a>
+                    </div>
+                </div>
+            @empty
+                <p>Пока нет объявлений.</p>
+            @endforelse
+        </div>
+
+        <div class="container-map" style="margin-top: 24px;">
+            <div class="map-section">
+                <h3 class="section-title" style="margin: 0 0 16px;">Карта объявлений</h3>
+                <div id="exchange-map" class="map-container"></div>
+            </div>
         </div>
     </div>
-</section>
+</div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -59,10 +62,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }).addTo(map);
 
     const markers = @json($exchangeMarkers);
+    const markerIcon = L.divIcon({
+        className: 'custom-marker',
+        html: '📍',
+        iconSize: [42, 42],
+        iconAnchor: [21, 42],
+        popupAnchor: [0, -42]
+    });
 
     const markerGroup = [];
     markers.forEach((item) => {
-        const marker = L.marker([item.latitude, item.longitude]).addTo(map);
+        const marker = L.marker([item.latitude, item.longitude], { icon: markerIcon }).addTo(map);
         marker.bindPopup(`
             <div style="padding: 6px;">
                 <strong>${item.title}</strong><br>

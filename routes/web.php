@@ -1,13 +1,12 @@
 <?php
-use App\Http\Controllers\FavoriteController; 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\BookExchangeController;
 use App\Http\Controllers\ClubController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\FavoriteController;
 use Illuminate\Support\Facades\Route;
-
-
 
 // ========== ПУБЛИЧНЫЕ МАРШРУТЫ ==========
 Route::get('/', [EventController::class, 'index'])->name('home');
@@ -30,12 +29,14 @@ Route::post('/club-join/{id}', [ClubController::class, 'join'])->name('club.join
 Route::post('/club-leave/{id}', [ClubController::class, 'leave'])->name('club.leave');
 Route::post('/club-ban/{id}', [ClubController::class, 'banUser'])->name('club.ban');
 Route::post('/club-assign-role/{id}', [ClubController::class, 'assignRole'])->name('club.assignRole');
-Route::get('/club-faq', function () { return view('pages.club_faq'); })->name('club.faq');
+Route::get('/club-faq', function () { return view('pages.clubs.club_faq'); })->name('club.faq');
 Route::get('/event-index', [EventController::class, 'index'])->name('event.index');
 Route::get('/admin-panel', function () { return view('pages.admin_panel'); })->name('admin.panel');
 Route::get('/moderator-panel', function () { return view('pages.moderator_panel'); })->name('moderator.panel');
-Route::get('/articles', function () { return view('pages.articles_index'); })->name('articles');
+Route::get('/articles', [ArticleController::class, 'index'])->name('articles.index');
+Route::get('/article/{article}', [ArticleController::class, 'show'])->name('articles.show');
 Route::get('/author-faq', function () { return view('pages.author_faq'); })->name('author.faq');
+Route::get('/contacts', function () { return view('pages.contacts'); })->name('contacts');
 
 Route::get('/books-exchange', [BookExchangeController::class, 'index'])->name('exchange.index');
 Route::get('/exchange-show/{exchange}', [BookExchangeController::class, 'show'])->name('exchange.show');
@@ -75,6 +76,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/exchange-destroy/{exchange}', [BookExchangeController::class, 'destroy'])->name('exchange.destroy');
     Route::post('/exchange-book/{exchange}', [BookExchangeController::class, 'book'])->name('exchange.book');
     Route::post('/exchange-unbook/{exchange}', [BookExchangeController::class, 'unbook'])->name('exchange.unbook');
+
+    Route::get('/articles/create', [ArticleController::class, 'create'])->name('articles.create');
+    Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
+    Route::get('/articles/{article}/edit', [ArticleController::class, 'edit'])->name('articles.edit');
+    Route::post('/articles/{article}', [ArticleController::class, 'update'])->name('articles.update');
+    Route::get('/articles/{article}/delete', [ArticleController::class, 'delete'])->name('articles.delete');
+    Route::delete('/articles/{article}', [ArticleController::class, 'destroy'])->name('articles.destroy');
+    Route::post('/articles/{article}/comment', [ArticleController::class, 'storeComment'])->name('articles.comment.store');
     
     // ========== АДМИНСКИЕ МАРШРУТЫ (только для админов) ==========
     Route::get('/add', [EventController::class, 'create'])->name('event.create');

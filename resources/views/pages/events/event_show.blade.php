@@ -95,9 +95,9 @@
                             </div>
                             @auth
                                 @if(auth()->user()->canDeleteComment($comment) || auth()->id() === $comment->user_id)
-                                    <div style="position: relative;">
+                                    <div class="comment-menu-wrapper">
                                         <button type="button" onclick="var menu=this.parentNode.querySelector('.comment-menu'); menu.style.display=(menu.style.display==='block'?'none':'block');" style="border: none; background: transparent; cursor: pointer; font-size: 1.2rem; color: #8a5a20; padding: 2px 6px; display: inline-block; position: relative; z-index: 2;">⋯</button>
-                                        <div class="comment-menu" style="display: none; position: absolute; right: 0; top: 28px; background: white; border: 1px solid #e8dcc8; border-radius: 8px; padding: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 10; min-width: 200px;">
+                                        <div class="comment-menu">
                                             @if(auth()->id() === $comment->user_id)
                                                 <form method="POST" action="{{ route('comments.update', $comment) }}" style="margin: 0 0 6px;">
                                                     @csrf

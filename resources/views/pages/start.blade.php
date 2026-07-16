@@ -5,25 +5,34 @@
     <div class="container" style="margin-bottom: 60px;" id="events-list">
         <h2 class="section-title">Лента мероприятий</h2>
 
-        <form method="GET" class="form-group" style="margin-bottom: 20px;">
-            <label>Поиск мероприятия</label>
-            <input type="text" name="q" value="{{ $query ?? '' }}" placeholder="Введите название, место или тег">
+        <form method="GET" class="filter-panel" style="margin-bottom: 20px;">
+            <div class="filter-grid">
+                <div class="filter-field">
+                    <label>Поиск мероприятия</label>
+                    <input type="text" name="q" value="{{ $query ?? '' }}" placeholder="Введите название, место или тег">
+                </div>
 
-            <label>Фильтр по дате</label>
-            <select name="date_filter">
-                <option value="all" {{ ($dateFilter ?? 'all') === 'all' ? 'selected' : '' }}>Все</option>
-                <option value="upcoming" {{ ($dateFilter ?? '') === 'upcoming' ? 'selected' : '' }}>Предстоящие</option>
-                <option value="past" {{ ($dateFilter ?? '') === 'past' ? 'selected' : '' }}>Прошедшие</option>
-            </select>
+                <div class="filter-field">
+                    <label>От</label>
+                    <input type="date" name="date_from" value="{{ $dateFrom ?? '' }}">
+                </div>
 
-            <label>Теги</label>
-            <select name="tags[]" class="tag-select" multiple size="6">
-                @foreach($availableTags ?? [] as $value => $label)
-                    <option value="{{ $value }}" {{ in_array($value, $tags ?? [], true) ? 'selected' : '' }}>{{ $label }}</option>
-                @endforeach
-            </select>
+                <div class="filter-field">
+                    <label>До</label>
+                    <input type="date" name="date_to" value="{{ $dateTo ?? '' }}">
+                </div>
+            </div>
 
-            <input type="submit" class="btn btn-outline" value="Применить">
+            <div class="filter-field" style="margin-top: 12px;">
+                <label>Теги</label>
+                <select name="tags[]" class="tag-select" multiple size="6">
+                    @foreach($availableTags ?? [] as $value => $label)
+                        <option value="{{ $value }}" {{ in_array($value, $tags ?? [], true) ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <input type="submit" class="btn btn-outline" value="Применить" style="margin-top: 12px;">
         </form>
 
         @if($events->count() > 0)
@@ -114,6 +123,36 @@
             transition: transform 0.2s;
         }
         .custom-marker:hover { transform: scale(1.1); z-index: 1000 !important; }
+        .filter-panel {
+            background: #f8f4ea;
+            border: 1px solid #e8dcc8;
+            border-radius: 16px;
+            padding: 18px;
+        }
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+        .filter-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .filter-field label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6b4c1d;
+            text-transform: none;
+        }
+        .filter-field input,
+        .filter-field select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d8c8a8;
+            border-radius: 10px;
+            background: #fffdf9;
+        }
         .tag-select {
             width: 100%;
             min-height: 140px;
@@ -168,9 +207,10 @@
             // Кастомная иконка
             const createCustomIcon = () => L.divIcon({
                 className: 'custom-marker',
-                iconSize: [40, 40],
-                iconAnchor: [20, 40],
-                popupAnchor: [0, -40]
+                html: '📍',
+                iconSize: [42, 42],
+                iconAnchor: [21, 42],
+                popupAnchor: [0, -42]
             });
 
             let markersCount = 0;

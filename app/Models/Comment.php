@@ -18,6 +18,11 @@ class Comment extends Model
         return $this->belongsTo(Event::class);
     }
 
+    public function article()
+    {
+        return $this->belongsTo(Article::class);
+    }
+
     public function profileUser()
     {
         return $this->belongsTo(User::class, 'profile_user_id');

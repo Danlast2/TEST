@@ -5,6 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property string $title
+ * @property string|null $description
+ * @property string $place
+ * @property \Illuminate\Support\Carbon|null $date
+ * @property string $contacts
+ * @property float|null $latitude
+ * @property float|null $longitude
+ * @property string $status
+ * @property int|null $booked_by_user_id
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ */
 class BookExchange extends Model
 {
     use HasFactory;
