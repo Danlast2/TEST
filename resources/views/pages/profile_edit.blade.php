@@ -1,0 +1,38 @@
+@extends('template.app')
+@section('page')
+
+<section class="profile-card">
+    <h2>Редактирование профиля</h2>
+    <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
+        @csrf
+
+        <div class="form-group">
+            <label>Имя пользователя</label>
+            <input type="text" name="username" value="{{ old('username', $user->username) }}" required>
+            @error('username') <span class="error">* {{ $message }}</span> @enderror
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" value="{{ old('email', $user->email) }}" required>
+            @error('email') <span class="error">* {{ $message }}</span> @enderror
+        </div>
+
+        <div class="form-group">
+            <label>Описание</label>
+            <textarea name="description" rows="5" maxlength="1000" placeholder="Напишите немного о себе (до 1000 символов)">{{ old('description', $user->description) }}</textarea>
+            <div style="font-size: 0.9rem; color: #7a6b55; margin-top: 4px;">До 1000 символов</div>
+            @error('description') <span class="error">* {{ $message }}</span> @enderror
+        </div>
+
+        <div class="form-group">
+            <label>Аватар</label>
+            <input type="file" name="avatar" accept="image/*">
+            @error('avatar') <span class="error">* {{ $message }}</span> @enderror
+        </div>
+
+        <input type="submit" class="btn btn-primary" value="Сохранить">
+    </form>
+</section>
+
+@endsection

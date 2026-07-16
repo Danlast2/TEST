@@ -69,6 +69,7 @@ body {
     margin: 0 auto;
     background: var(--bg-container);
     min-height: calc(100vh - 72px);
+    padding: 24px 32px 40px;
 }
 
 /* ===== ШАПКА ===== */
@@ -312,8 +313,25 @@ body {
 .object-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 28px;
+    gap: 24px;
+    margin-bottom: 36px;
+}
+
+.container-map {
+    width: 100%;
+}
+
+.map-section {
     margin-bottom: 40px;
+}
+
+.map-container {
+    height: 500px;
+    width: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    background: #e2e8f0;
 }
 
 .card {
@@ -669,7 +687,7 @@ hr {
 /* ===== АДАПТИВНОСТЬ ===== */
 @media (max-width: 768px) {
     .container {
-        padding: 0 20px 32px;
+        padding: 16px 20px 32px;
     }
     
     .header, .footer {
@@ -707,10 +725,15 @@ hr {
     
     .form-card, .profile-card {
         padding: 24px 20px;
+        max-width: 100%;
     }
     
     .detail-content {
         padding: 24px 20px;
+    }
+
+    .map-container {
+        height: 360px;
     }
     
     .detail-content h2 {

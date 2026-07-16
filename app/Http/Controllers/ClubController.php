@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ClubMembership;
 use App\Models\Event;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -38,7 +39,9 @@ class ClubController extends Controller
         $query = $request->input('member');
 
         $members = User::query()
-            ->where('club_id', $club->id)
+            ->whereHas('clubMemberships', function ($q) use ($club) {
+                $q->where('club_id', $club->id);
+            })
             ->where('id', '!=', $club->id)
             ->where('club_banned', false)
             ->when($query, function ($q) use ($query) {
@@ -66,8 +69,11 @@ class ClubController extends Controller
         }
 
         $user = Auth::user();
-        $user->club_id = $club->id;
-        $user->save();
+
+        ClubMembership::firstOrCreate([
+            'user_id' => $user->id,
+            'club_id' => $club->id,
+        ]);
 
         return back()->with('success', 'Вы присоединились к клубу.');
     }
@@ -81,8 +87,10 @@ class ClubController extends Controller
         }
 
         $user = Auth::user();
-        $user->club_id = null;
-        $user->save();
+
+        ClubMembership::where('user_id', $user->id)
+            ->where('club_id', $club->id)
+            ->delete();
 
         return back()->with('success', 'Вы покинули клуб.');
     }

@@ -25,9 +25,11 @@
         @endforelse
     </div>
 
-    <div class="map-section" style="margin-top: 24px;">
-        <h3>Карта объявлений</h3>
-        <div id="exchange-map" style="height: 420px; width: 100%; border-radius: 16px; border: 1px solid #ddd;"></div>
+    <div class="container-map" style="margin-top: 24px;">
+        <div class="map-section">
+            <h3 class="section-title" style="margin-bottom: 15px;">Карта объявлений</h3>
+            <div id="exchange-map" class="map-container"></div>
+        </div>
     </div>
 </section>
 

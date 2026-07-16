@@ -3,6 +3,7 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\BookExchangeController;
 use App\Http\Controllers\ClubController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,7 @@ Route::get('/api/events/map-data', [EventController::class, 'mapData'])->name('e
 Route::get('/event-image/{path}', [EventController::class, 'image'])->where('path', '.*')->name('event.image');
 Route::get('/events/{id}', [EventController::class, 'show'])->name('event.show');
 Route::get('/users/{id}', [AccountController::class, 'showUserProfile'])->name('user.profile');
+Route::get('/profile-avatar/{path}', [AccountController::class, 'avatar'])->where('path', '.*')->name('profile.avatar');
 Route::get('/ban', function () { return view('pages.ban'); })->name('ban');
 
 Route::get('/club-index', [ClubController::class, 'index'])->name('club.index');
@@ -54,6 +56,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AccountController::class, 'logout'])->name('logout');
     // Профиль
     Route::get('/profile', [AccountController::class, 'profile'])->name('profile');
+    Route::get('/profile/edit', [AccountController::class, 'editProfile'])->name('profile.edit');
+    Route::post('/profile/update', [AccountController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/comments/event/{event}', [CommentController::class, 'storeEventComment'])->name('comments.event.store');
+    Route::post('/comments/profile/{user}', [CommentController::class, 'storeProfileComment'])->name('comments.profile.store');
+    Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
 
     Route::post('/favorites/store/{id}', [FavoriteController::class, 'store'])->name('favorites.store');
@@ -66,6 +74,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/exchange-delete/{exchange}', [BookExchangeController::class, 'delete'])->name('exchange.delete');
     Route::delete('/exchange-destroy/{exchange}', [BookExchangeController::class, 'destroy'])->name('exchange.destroy');
     Route::post('/exchange-book/{exchange}', [BookExchangeController::class, 'book'])->name('exchange.book');
+    Route::post('/exchange-unbook/{exchange}', [BookExchangeController::class, 'unbook'])->name('exchange.unbook');
     
     // ========== АДМИНСКИЕ МАРШРУТЫ (только для админов) ==========
     Route::get('/add', [EventController::class, 'create'])->name('event.create');

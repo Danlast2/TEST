@@ -21,11 +21,22 @@
             @endif
 
             @auth
-                @if(auth()->user()->id !== $exchange->user_id)
+                @php
+                    $currentUserId = Auth::id();
+                    $isOwner = (int) $currentUserId === (int) $exchange->user_id;
+                    $canBook = ! $isOwner && $exchange->status !== 'booked';
+                @endphp
+
+                @if(! $isOwner)
                     @if($exchange->status !== 'booked')
-                        <form method="POST" action="{{ route('exchange.book', $exchange->id) }}" style="margin-top: 12px;">
+                        <form method="POST" action="{{ route('exchange.book', $exchange->id) }}" style="margin-top: 12px;" onsubmit="return confirm('Подтвердить бронь этого обмена?');">
                             @csrf
                             <button class="btn btn-primary">Забронировать</button>
+                        </form>
+                    @elseif($exchange->booked_by_user_id === $currentUserId)
+                        <form method="POST" action="{{ route('exchange.unbook', $exchange->id) }}" style="margin-top: 12px;">
+                            @csrf
+                            <button class="btn btn-outline">Отказаться от обмена</button>
                         </form>
                     @else
                         <p style="color: #dc2626; margin-top: 12px;">Книга уже забронирована.</p>

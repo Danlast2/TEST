@@ -32,6 +32,12 @@ class BookExchangeController extends Controller
             'longitude' => 'required|numeric|between:-180,180',
         ]);
 
+        if ($request->filled('date')) {
+            $validated['date'] = $request->input('date');
+        } else {
+            $validated['date'] = null;
+        }
+
         $validated['user_id'] = Auth::id();
         $validated['status'] = 'active';
 
@@ -60,11 +66,17 @@ class BookExchangeController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'place' => 'required|string|max:255',
-            'date' => 'required|date',
+            'date' => 'nullable|date',
             'contacts' => 'required|string|max:255',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
         ]);
+
+        if ($request->filled('date')) {
+            $validated['date'] = $request->input('date');
+        } else {
+            $validated['date'] = null;
+        }
 
         $exchange->update($validated);
 
@@ -105,5 +117,23 @@ class BookExchangeController extends Controller
         ]);
 
         return back()->with('success', 'Книга забронирована');
+    }
+
+    public function unbook(BookExchange $exchange)
+    {
+        if (! Auth::check()) {
+            abort(403);
+        }
+
+        if ($exchange->booked_by_user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $exchange->update([
+            'status' => 'active',
+            'booked_by_user_id' => null,
+        ]);
+
+        return back()->with('success', 'Бронирование отменено');
     }
 }

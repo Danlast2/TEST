@@ -30,7 +30,7 @@
 
         <div class="form-group">
             <label>Дата и время</label>
-            <input type="datetime-local" name="date" value="{{ old('date') }}" required>
+            <input type="datetime-local" name="date" value="{{ old('date') }}">
             @error('date') <span class="error">* {{ $message }}</span> @enderror
         </div>
 

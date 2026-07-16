@@ -22,6 +22,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'description',
+        'avatar',
     ];
 
     /**
@@ -59,6 +61,23 @@ class User extends Authenticatable
         return $this->belongsToMany(Event::class, 'event_registrations');
     }
 
+    public function clubMemberships()
+    {
+        return $this->hasMany(ClubMembership::class);
+    }
+
+    public function joinedClubs()
+    {
+        return $this->belongsToMany(User::class, 'club_memberships', 'user_id', 'club_id');
+    }
+
+    public function clubEvents()
+    {
+        return Event::query()
+            ->whereIn('club_id', $this->joinedClubs()->pluck('users.id'))
+            ->whereNotIn('id', $this->registeredEvents()->pluck('events.id'));
+    }
+
     public function canManageEvent($event): bool
     {
         $role = $this->role;
@@ -90,6 +109,42 @@ class User extends Authenticatable
         }
 
         return $this->id === $exchange->user_id;
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function getAvatarPathAttribute()
+    {
+        return $this->avatar ? ltrim($this->avatar, '/') : null;
+    }
+
+    public function getAvatarUrlAttribute()
+    {
+        return $this->avatar_path ? route('profile.avatar', ['path' => $this->avatar_path]) : null;
+    }
+
+    public function canDeleteComment($comment): bool
+    {
+        if (in_array($this->role, ['admin', 'moderator'], true)) {
+            return true;
+        }
+
+        if ($this->id === $comment->user_id) {
+            return true;
+        }
+
+        if ($comment->event_id && $comment->event && $this->canManageEvent($comment->event)) {
+            return true;
+        }
+
+        if ($comment->profile_user_id && $comment->profile_user_id === $this->id) {
+            return true;
+        }
+
+        return false;
     }
 
     public function canManageClub($club): bool

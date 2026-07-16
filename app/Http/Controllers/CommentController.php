@@ -1,0 +1,86 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Comment;
+use App\Models\Event;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class CommentController extends Controller
+{
+    public function storeEventComment(Request $request, Event $event)
+    {
+        $request->validate([
+            'content' => 'required|string|max:1000',
+        ]);
+
+        if (! Auth::check()) {
+            abort(403);
+        }
+
+        Comment::create([
+            'user_id' => Auth::id(),
+            'event_id' => $event->id,
+            'content' => $request->input('content'),
+        ]);
+
+        return back()->with('success', 'Комментарий добавлен.');
+    }
+
+    public function storeProfileComment(Request $request, User $user)
+    {
+        $request->validate([
+            'content' => 'required|string|max:1000',
+        ]);
+
+        if (! Auth::check()) {
+            abort(403);
+        }
+
+        Comment::create([
+            'user_id' => Auth::id(),
+            'profile_user_id' => $user->id,
+            'content' => $request->input('content'),
+        ]);
+
+        return back()->with('success', 'Комментарий добавлен.');
+    }
+
+    public function update(Request $request, Comment $comment)
+    {
+        if (! Auth::check()) {
+            abort(403);
+        }
+
+        if (Auth::id() !== $comment->user_id) {
+            abort(403);
+        }
+
+        $request->validate([
+            'content' => 'required|string|max:1000',
+        ]);
+
+        $comment->update([
+            'content' => $request->input('content'),
+        ]);
+
+        return back()->with('success', 'Комментарий обновлён.');
+    }
+
+    public function destroy(Comment $comment)
+    {
+        if (! Auth::check()) {
+            abort(403);
+        }
+
+        if (! Auth::user()->canDeleteComment($comment)) {
+            abort(403);
+        }
+
+        $comment->delete();
+
+        return back()->with('success', 'Комментарий удалён.');
+    }
+}

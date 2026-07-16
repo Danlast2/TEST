@@ -11,6 +11,34 @@ class BookExchangeTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_user_can_create_an_exchange_without_date(): void
+    {
+        $user = User::create([
+            'username' => 'owner',
+            'email' => 'owner@example.com',
+            'password' => 'password',
+            'role' => 'user',
+        ]);
+
+        $this->actingAs($user);
+
+        $response = $this->post(route('exchange.store'), [
+            'title' => 'Война и мир',
+            'description' => 'Готов обменять',
+            'place' => 'Казань',
+            'contacts' => 'Телефон: 123',
+            'latitude' => 55.7887,
+            'longitude' => 49.1221,
+        ]);
+
+        $response->assertRedirect(route('exchange.index'));
+        $this->assertDatabaseHas('book_exchanges', [
+            'user_id' => $user->id,
+            'title' => 'Война и мир',
+            'date' => null,
+        ]);
+    }
+
     public function test_user_can_book_an_exchange_and_status_updates(): void
     {
         $owner = User::create([
