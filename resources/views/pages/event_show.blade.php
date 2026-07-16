@@ -8,13 +8,16 @@
     <div class="detail-content">
         <h2>{{ $event->title}}</h2>
         <p><strong>Описание:</strong> {{ $event->description}}</p>
+        @if(!empty($event->tags_labels))
+            <p><strong>Теги:</strong> {{ implode(', ', $event->tags_labels) }}</p>
+        @endif
         <p><strong>Дата:</strong> {{ $event->date}}</p>
         <p><strong>Место:</strong> {{ $event->place}}</p>
         <p><strong>Минимум для проведения:</strong> {{ $event->min_entries ?? 0 }}</p>
         <p><strong>Записались:</strong> {{ $event->registered_count }}/{{ $event->max_entries }}</p>
 
         @guest
-            <p>Чтобы записаться на мероприятие, пожалуйста, <a href="{{ route('login') }}">войдите</a></p>
+            <p>Чтобы записаться на мероприятие, пожалуйста, <a href="{{ route('show.login') }}">войдите</a></p>
         @endguest
 
         @auth

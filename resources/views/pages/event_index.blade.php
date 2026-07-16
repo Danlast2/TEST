@@ -23,6 +23,13 @@
             <option value="popular" {{ ($sort ?? '') === 'popular' ? 'selected' : '' }}>По популярности</option>
         </select>
 
+        <label>Теги</label>
+        <select name="tags[]" class="tag-select" multiple size="6">
+            @foreach($availableTags ?? [] as $value => $label)
+                <option value="{{ $value }}" {{ in_array($value, $tags ?? [], true) ? 'selected' : '' }}>{{ $label }}</option>
+            @endforeach
+        </select>
+
         <input type="submit" class="btn btn-outline" value="Применить">
     </form>
 
@@ -35,6 +42,9 @@
                 <div class="card-content">
                     <h3 class="card-title">{{ $event->title }}</h3>
                     <p>Дата: {{ $event->date }} · {{ $event->place }}</p>
+                    @if(!empty($event->tags_labels))
+                        <p>Теги: {{ implode(', ', $event->tags_labels) }}</p>
+                    @endif
                     <p>Записалось: {{ $event->registered_count }}</p>
                     <a href="{{ route('event.show', $event->id) }}" class="btn btn-outline">Подробнее</a>
                 </div>
@@ -44,4 +54,25 @@
         @endforelse
     </div>
 </section>
+<style>
+    .tag-select {
+        width: 100%;
+        min-height: 140px;
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        background: #fff;
+        color: #0f172a;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    }
+    .tag-select option {
+        padding: 8px 10px;
+        border-radius: 8px;
+        margin: 2px 0;
+    }
+    .tag-select option:checked {
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        color: #fff;
+    }
+</style>
 @endsection

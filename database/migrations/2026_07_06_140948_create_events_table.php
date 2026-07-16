@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('latitude', 10, 7);
             $table->decimal('longitude', 10, 7);
             $table->string('description');
+            $table->json('tags')->nullable();
             $table->integer('min_entries')->default(0);
             $table->integer('max_entries')->default(10);
             $table->unsignedBigInteger('club_id')->nullable();

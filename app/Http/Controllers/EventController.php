@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\EventTag;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,14 +18,21 @@ class EventController extends Controller
         $query = trim((string) $request->input('q', ''));
         $dateFilter = $request->input('date_filter', 'all');
         $sort = $request->input('sort', 'date');
+        $selectedTags = array_values(array_filter(array_map('trim', (array) $request->input('tags', []))));
 
         $eventsQuery = Event::query()
             ->when($query !== '', function ($q) use ($query) {
                 $q->where(function ($sub) use ($query) {
                     $sub->where('title', 'like', '%' . $query . '%')
                         ->orWhere('place', 'like', '%' . $query . '%')
-                        ->orWhere('description', 'like', '%' . $query . '%');
+                        ->orWhere('description', 'like', '%' . $query . '%')
+                        ->orWhereJsonContains('tags', $query);
                 });
+            })
+            ->when(! empty($selectedTags), function ($q) use ($selectedTags) {
+                foreach ($selectedTags as $tag) {
+                    $q->whereJsonContains('tags', $tag);
+                }
             });
 
         if ($dateFilter === 'upcoming') {
@@ -41,7 +49,9 @@ class EventController extends Controller
 
         $events = $eventsQuery->get();
 
-        return view('pages.event_index', compact('events', 'query', 'dateFilter', 'sort'));
+        return view('pages.event_index', compact('events', 'query', 'dateFilter', 'sort', 'selectedTags'))
+            ->with('availableTags', EventTag::options())
+            ->with('tags', $selectedTags);
     }
 
 
@@ -50,14 +60,21 @@ class EventController extends Controller
         $query = trim((string) $request->input('q', ''));
         $dateFilter = $request->input('date_filter', 'all');
         $sort = $request->input('sort', 'date');
+        $selectedTags = array_values(array_filter(array_map('trim', (array) $request->input('tags', []))));
 
         $eventsQuery = Event::query()
             ->when($query !== '', function ($q) use ($query) {
                 $q->where(function ($sub) use ($query) {
                     $sub->where('title', 'like', '%' . $query . '%')
                         ->orWhere('place', 'like', '%' . $query . '%')
-                        ->orWhere('description', 'like', '%' . $query . '%');
+                        ->orWhere('description', 'like', '%' . $query . '%')
+                        ->orWhereJsonContains('tags', $query);
                 });
+            })
+            ->when(! empty($selectedTags), function ($q) use ($selectedTags) {
+                foreach ($selectedTags as $tag) {
+                    $q->whereJsonContains('tags', $tag);
+                }
             });
 
         if ($dateFilter === 'upcoming') {
@@ -89,7 +106,9 @@ class EventController extends Controller
             ];
         })->values();
 
-        return view('pages.start', compact('events', 'query', 'dateFilter', 'sort', 'mapMarkers'));
+        return view('pages.start', compact('events', 'query', 'dateFilter', 'sort', 'selectedTags', 'mapMarkers'))
+            ->with('availableTags', EventTag::options())
+            ->with('tags', $selectedTags);
     }
     /**
      * Show the form for creating a new resource.
@@ -102,7 +121,7 @@ class EventController extends Controller
             abort(403);
         }
 
-        return view('pages.event_create');
+        return view('pages.event_create')->with('availableTags', EventTag::options());
     }
 
     /**
@@ -121,12 +140,16 @@ class EventController extends Controller
             'date'        => 'required|date',
             'place'       => 'required|string|max:255',
             'description' => 'nullable|string',
+            'tags'        => 'nullable|array',
+            'tags.*'      => 'nullable|string|in:' . implode(',', array_map(static fn (EventTag $tag) => $tag->value, EventTag::cases())),
             'min_entries' => 'nullable|integer|min:0',
             'max_entries' => 'nullable|integer|min:1',
             'image'       => 'nullable|image|mimes:jpg,jpeg,webp|max:50',
             'latitude'    => 'required|numeric|between:-90,90',
             'longitude'   => 'required|numeric|between:-180,180',
         ]);
+
+        $validated['tags'] = array_values(array_filter($validated['tags'] ?? []));
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('events', 'public');
@@ -164,7 +187,7 @@ class EventController extends Controller
             abort(403);
         }
 
-        return view('pages.event_edit', compact('event'));
+        return view('pages.event_edit', compact('event'))->with('availableTags', EventTag::options());
     }
 
     /**
@@ -183,12 +206,16 @@ class EventController extends Controller
             'date'        => 'required|date',
             'place'       => 'required|string|max:255',
             'description' => 'nullable|string',
+            'tags'        => 'nullable|array',
+            'tags.*'      => 'nullable|string|in:' . implode(',', array_map(static fn (EventTag $tag) => $tag->value, EventTag::cases())),
             'min_entries' => 'nullable|integer|min:0',
             'max_entries' => 'nullable|integer|min:1',
             'image'       => 'nullable|image|mimes:jpg,jpeg,webp|max:50',
             'latitude'    => 'required|numeric|between:-90,90',
             'longitude'   => 'required|numeric|between:-180,180',
         ]);
+
+        $validated['tags'] = array_values(array_filter($validated['tags'] ?? []));
 
         if ($request->hasFile('image')) {
             if ($event->image) {

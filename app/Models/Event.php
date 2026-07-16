@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\EventTag;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,6 +11,10 @@ class Event extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    protected $casts = [
+        'tags' => 'array',
+    ];
 
     public function registrations()
     {
@@ -49,5 +54,16 @@ class Event extends Model
     public function getCapacityLabelAttribute()
     {
         return $this->registered_count . '/' . $this->max_entries;
+    }
+
+    public function getTagsLabelsAttribute(): array
+    {
+        $tags = (array) ($this->tags ?? []);
+
+        return array_values(array_filter(array_map(function ($tag) {
+            $enum = EventTag::tryFrom($tag);
+
+            return $enum ? $enum->label() : null;
+        }, $tags)));
     }
 }

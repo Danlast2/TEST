@@ -10,21 +10,71 @@
     </div>
 
     <div class="object-grid">
-        <div class="card">
-            <div class="card-content">
-                <h3 class="card-title">Обмен «Война и мир»</h3>
-                <p>Готов обменять на книгу по психологии.</p>
-                <a href="{{ route('exchange.show', 1) }}" class="btn btn-outline">Подробнее</a>
+        @forelse($exchanges as $exchange)
+            <div class="card">
+                <div class="card-content">
+                    <h3 class="card-title">{{ $exchange->title }}</h3>
+                    <p>{{ Str::limit($exchange->description, 120) }}</p>
+                    <p><strong>Место:</strong> {{ $exchange->place }}</p>
+                    <p><strong>Статус:</strong> {{ $exchange->status === 'booked' ? 'Забронировано' : 'Активно' }}</p>
+                    <a href="{{ route('exchange.show', $exchange->id) }}" class="btn btn-outline">Подробнее</a>
+                </div>
             </div>
-        </div>
+        @empty
+            <p>Пока нет объявлений.</p>
+        @endforelse
+    </div>
 
-        <div class="card">
-            <div class="card-content">
-                <h3 class="card-title">Подари «Преступление и наказание»</h3>
-                <p>Отдам бесплатно в хорошем состоянии.</p>
-                <a href="{{ route('exchange.show', 2) }}" class="btn btn-outline">Подробнее</a>
-            </div>
-        </div>
+    <div class="map-section" style="margin-top: 24px;">
+        <h3>Карта объявлений</h3>
+        <div id="exchange-map" style="height: 420px; width: 100%; border-radius: 16px; border: 1px solid #ddd;"></div>
     </div>
 </section>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+@php
+$exchangeMarkers = $exchanges
+    ->filter(fn($exchange) => !empty($exchange->latitude) && !empty($exchange->longitude))
+    ->map(function ($exchange) {
+        return [
+            'id' => $exchange->id,
+            'title' => $exchange->title,
+            'latitude' => (float) $exchange->latitude,
+            'longitude' => (float) $exchange->longitude,
+            'place' => $exchange->place,
+            'url' => route('exchange.show', $exchange->id),
+        ];
+    })
+    ->values();
+@endphp
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const map = L.map('exchange-map').setView([55.751244, 37.618423], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap',
+        maxZoom: 19
+    }).addTo(map);
+
+    const markers = @json($exchangeMarkers);
+
+    const markerGroup = [];
+    markers.forEach((item) => {
+        const marker = L.marker([item.latitude, item.longitude]).addTo(map);
+        marker.bindPopup(`
+            <div style="padding: 6px;">
+                <strong>${item.title}</strong><br>
+                ${item.place}<br>
+                <a href="${item.url}" style="display:inline-block;margin-top:6px;">Подробнее</a>
+            </div>
+        `);
+        markerGroup.push(marker);
+    });
+
+    if (markerGroup.length > 0) {
+        const group = new L.featureGroup(markerGroup);
+        map.fitBounds(group.getBounds().pad(0.1));
+    }
+});
+</script>
 @endsection

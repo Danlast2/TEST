@@ -83,6 +83,15 @@ class User extends Authenticatable
         return in_array($this->role, ['admin', 'moderator', 'club', 'club_moderator'], true);
     }
 
+    public function canManageBookExchange($exchange): bool
+    {
+        if (in_array($this->role, ['admin', 'moderator'], true)) {
+            return true;
+        }
+
+        return $this->id === $exchange->user_id;
+    }
+
     public function canManageClub($club): bool
     {
         if ($this->role === 'admin') {

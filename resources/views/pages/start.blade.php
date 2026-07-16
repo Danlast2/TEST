@@ -5,6 +5,27 @@
     <div class="container" style="margin-bottom: 60px;" id="events-list">
         <h2 class="section-title">Лента мероприятий</h2>
 
+        <form method="GET" class="form-group" style="margin-bottom: 20px;">
+            <label>Поиск мероприятия</label>
+            <input type="text" name="q" value="{{ $query ?? '' }}" placeholder="Введите название, место или тег">
+
+            <label>Фильтр по дате</label>
+            <select name="date_filter">
+                <option value="all" {{ ($dateFilter ?? 'all') === 'all' ? 'selected' : '' }}>Все</option>
+                <option value="upcoming" {{ ($dateFilter ?? '') === 'upcoming' ? 'selected' : '' }}>Предстоящие</option>
+                <option value="past" {{ ($dateFilter ?? '') === 'past' ? 'selected' : '' }}>Прошедшие</option>
+            </select>
+
+            <label>Теги</label>
+            <select name="tags[]" class="tag-select" multiple size="6">
+                @foreach($availableTags ?? [] as $value => $label)
+                    <option value="{{ $value }}" {{ in_array($value, $tags ?? [], true) ? 'selected' : '' }}>{{ $label }}</option>
+                @endforeach
+            </select>
+
+            <input type="submit" class="btn btn-outline" value="Применить">
+        </form>
+
         @if($events->count() > 0)
             <div class="object-grid">
                 @foreach ($events as $event)
@@ -17,6 +38,11 @@
                             <div class="card-meta">
                                 {{ $event->date }} {{ $event->place }}
                             </div>
+                            @if(!empty($event->tags_labels))
+                                <div class="card-meta" style="margin-top: 6px; font-size: 13px; color: #64748b;">
+                                    {{ implode(', ', $event->tags_labels) }}
+                                </div>
+                            @endif
                             <a href="{{ route('event.show', $event->id) }}" class="btn btn-outline">
                                 Подробнее
                             </a>
@@ -88,6 +114,25 @@
             transition: transform 0.2s;
         }
         .custom-marker:hover { transform: scale(1.1); z-index: 1000 !important; }
+        .tag-select {
+            width: 100%;
+            min-height: 140px;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            background: #fff;
+            color: #0f172a;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+        }
+        .tag-select option {
+            padding: 8px 10px;
+            border-radius: 8px;
+            margin: 2px 0;
+        }
+        .tag-select option:checked {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            color: #fff;
+        }
 
         .leaflet-popup-content-wrapper { border-radius: 12px; padding: 0; overflow: hidden; }
         .leaflet-popup-content { margin: 0; width: 250px !important; }
@@ -169,7 +214,7 @@
             });
 
             document.getElementById('markers-count').textContent =
-                `Показано маркеров: ${markersCount}`;
+                `Показано мероприятий: ${markersCount}`;
 
             if (markersGroup.length > 0) {
                 const group = new L.featureGroup(markersGroup);

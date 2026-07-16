@@ -40,6 +40,22 @@
         </div>
 
         <div class="form-group">
+            <label>Теги мероприятия</label>
+            @php $selectedTags = $event->tags ?? []; @endphp
+            <div class="tag-select-wrap">
+                <select name="tags[]" class="tag-select" multiple size="7">
+                    @foreach($availableTags as $value => $label)
+                        <option value="{{ $value }}" {{ in_array($value, $selectedTags, true) ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+                <small style="color: #64748b; display: block; margin-top: 6px;">Можно выбрать несколько тегов. Удерживайте Ctrl/Cmd для выбора нескольких вариантов.</small>
+            </div>
+            @error('tags')
+                <span class="error">* {{ $message }}</span>
+            @enderror
+        </div>
+
+        <div class="form-group">
             <label>Минимум записей</label>
             <input type="number" name="min_entries" min="0" value="{{ $event->min_entries ?? 0 }}">
             @error('min_entries')

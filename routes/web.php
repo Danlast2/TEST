@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\FavoriteController; 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\BookExchangeController;
 use App\Http\Controllers\ClubController;
 use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
@@ -34,11 +35,8 @@ Route::get('/moderator-panel', function () { return view('pages.moderator_panel'
 Route::get('/articles', function () { return view('pages.articles_index'); })->name('articles');
 Route::get('/author-faq', function () { return view('pages.author_faq'); })->name('author.faq');
 
-Route::get('/books-exchange', function () { return view('pages.books.exchange_index'); })->name('exchange.index');
-Route::get('/exchange-create', function () { return view('pages.books.exchange_create'); })->name('exchange.create');
-Route::get('/exchange-edit/{id}', function ($id) { return view('pages.books.exchange_edit', compact('id')); })->name('exchange.edit');
-Route::get('/exchange-show/{id}', function ($id) { return view('pages.books.exchange_show', compact('id')); })->name('exchange.show');
-Route::get('/exchange-delete/{id}', function ($id) { return view('pages.books.exchange_delete', compact('id')); })->name('exchange.delete');
+Route::get('/books-exchange', [BookExchangeController::class, 'index'])->name('exchange.index');
+Route::get('/exchange-show/{exchange}', [BookExchangeController::class, 'show'])->name('exchange.show');
 
 // ========== ГОСТЕВЫЕ МАРШРУТЫ (только для неавторизованных) ==========
 Route::middleware('guest')->group(function () {
@@ -60,6 +58,14 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/favorites/store/{id}', [FavoriteController::class, 'store'])->name('favorites.store');
     Route::post('/favorites/destroy/{id}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
+
+    Route::get('/exchange-create', [BookExchangeController::class, 'create'])->name('exchange.create');
+    Route::post('/exchange-create', [BookExchangeController::class, 'store'])->name('exchange.store');
+    Route::get('/exchange-edit/{exchange}', [BookExchangeController::class, 'edit'])->name('exchange.edit');
+    Route::post('/exchange-update/{exchange}', [BookExchangeController::class, 'update'])->name('exchange.update');
+    Route::get('/exchange-delete/{exchange}', [BookExchangeController::class, 'delete'])->name('exchange.delete');
+    Route::delete('/exchange-destroy/{exchange}', [BookExchangeController::class, 'destroy'])->name('exchange.destroy');
+    Route::post('/exchange-book/{exchange}', [BookExchangeController::class, 'book'])->name('exchange.book');
     
     // ========== АДМИНСКИЕ МАРШРУТЫ (только для админов) ==========
     Route::get('/add', [EventController::class, 'create'])->name('event.create');

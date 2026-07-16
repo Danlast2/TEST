@@ -44,21 +44,31 @@
             @error('description') <span class="error">* {{ $message }}</span> @enderror
         </div>
 
-        {{-- Теги (заглушка) --}}
+        {{-- Теги --}}
         <div class="form-group">
-            <label>Теги</label>
+            <label>Теги мероприятия</label>
+            @php $selectedTags = old('tags', []); @endphp
+            <div class="tag-select-wrap">
+                <select name="tags[]" class="tag-select" multiple size="7">
+                    @foreach($availableTags as $value => $label)
+                        <option value="{{ $value }}" {{ in_array($value, $selectedTags, true) ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+                <small style="color: #64748b; display: block; margin-top: 6px;">Можно выбрать несколько тегов. Удерживайте Ctrl/Cmd для выбора нескольких вариантов.</small>
+            </div>
+            @error('tags') <span class="error">* {{ $message }}</span> @enderror
         </div>
 
         {{-- Минимум / Максимум записей --}}
         <div class="form-group">
             <label>Минимум записей</label>
-            <input type="number" name="min_entries" min="0" placeholder="0" value="{{ old('min_entries') }}">
+            <input type="number" name="min_entries" min="0" placeholder="" value="{{ old('min_entries', 1) }}">
             @error('min_entries') <span class="error">* {{ $message }}</span> @enderror
         </div>
 
         <div class="form-group">
             <label>Максимум записей</label>
-            <input type="number" name="max_entries" min="1" placeholder="10" value="{{ old('max_entries') }}">
+            <input type="number" name="max_entries" min="1" placeholder="" value="{{ old('max_entries', 10) }}">
             @error('max_entries') <span class="error">* {{ $message }}</span> @enderror
         </div>
 
@@ -83,6 +93,28 @@
         padding: 8px 12px;
         border: 1px solid #ccc;
         border-radius: 8px;
+    }
+    .tag-select-wrap {
+        margin-top: 6px;
+    }
+    .tag-select {
+        width: 100%;
+        min-height: 180px;
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        background: #fff;
+        color: #0f172a;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    }
+    .tag-select option {
+        padding: 8px 10px;
+        border-radius: 8px;
+        margin: 2px 0;
+    }
+    .tag-select option:checked {
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        color: #fff;
     }
 </style>
 
