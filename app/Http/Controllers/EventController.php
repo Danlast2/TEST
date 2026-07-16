@@ -35,6 +35,8 @@ class EventController extends Controller
             'date' => 'required|date',
             'place' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'min_entries' => 'nullable|integer|min:0',
+            'max_entries' => 'nullable|integer|min:1',
             'image' => 'required|image|mimes:jpg,jpeg,webp|max:50',
         ]);
 
@@ -78,6 +80,8 @@ class EventController extends Controller
             'date' => 'required|date',
             'place' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'min_entries' => 'nullable|integer|min:0',
+            'max_entries' => 'nullable|integer|min:1',
             // image делаем nullable, чтобы можно было сохранить изменения без новой картинки
             'image' => 'nullable|image|mimes:jpg,jpeg,webp|max:50',
         ]);

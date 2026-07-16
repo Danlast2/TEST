@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [EventController::class, 'index'])->name('home');
 Route::get('/event-image/{path}', [EventController::class, 'image'])->where('path', '.*')->name('event.image');
 Route::get('/events/{id}', [EventController::class, 'show'])->name('event.show');
+Route::get('/users/{id}', [AccountController::class, 'showUserProfile'])->name('user.profile');
 
 Route::get('/club-index', function () { return view('pages.club_index'); })->name('club.index');
 Route::get('/club-profile', function () { return view('pages.club_profile'); })->name('club.profile');

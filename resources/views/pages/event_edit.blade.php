@@ -40,7 +40,23 @@
         </div>
 
         <div class="form-group">
-            <label>Афиша (jpg/webp, до 50kb)</label>
+            <label>Минимум записей</label>
+            <input type="number" name="min_entries" min="0" value="{{ $event->min_entries ?? 0 }}">
+            @error('min_entries')
+                <span class="error">* {{ $message }}</span>
+            @enderror
+        </div>
+
+        <div class="form-group">
+            <label>Максимум записей</label>
+            <input type="number" name="max_entries" min="1" value="{{ $event->max_entries ?? 10 }}">
+            @error('max_entries')
+                <span class="error">* {{ $message }}</span>
+            @enderror
+        </div>
+
+        <div class="form-group">
+            <label></label>Афиша (jpg/webp, до 50kb)</label>
             @if($event->image)
                 <div class="mb-2">
                     <img src="{{ $event->image_url }}" alt="Текущая афиша" style="max-width: 220px; max-height: 180px; object-fit: cover;">

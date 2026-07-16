@@ -7,31 +7,48 @@
     </div>
     <div class="detail-content">
         <h2>{{ $event->title}}</h2>
+        <p><strong>Описание:</strong> {{ $event->description}}</p>
         <p><strong>Дата:</strong> {{ $event->date}}</p>
         <p><strong>Место:</strong> {{ $event->place}}</p>
-        <p><strong>Описание:</strong> {{ $event->description}}</p>
+        <p><strong>Минимум для проведения:</strong> {{ $event->min_entries ?? 0 }}</p>
+        <p><strong>Записались:</strong> {{ $event->registered_count }}/{{ $event->max_entries }}</p>
+
+        @auth
         <div class="flex">
-
-            @auth
-            @if(auth()->user()->hasFavorited($event->id))
-            <form action="{{route('favorites.destroy', $event->id)}}" method="POST">
-                @csrf
-                <input class="btn btn-primary" type="submit" value="Удалить">
-            </form>
+            @if(auth()->user()->hasRegistered($event->id))
+                <form action="{{ route('favorites.destroy', $event->id) }}" method="POST" onsubmit="return confirm('Отменить запись?');">
+                    @csrf
+                    <input class="btn btn-delete" type="submit" value="Отменить запись">
+                </form>
+            @elseif($event->registered_count < $event->max_entries)
+                <form action="{{ route('favorites.store', $event->id) }}" method="POST" onsubmit="return confirm('Записаться на мероприятие?');">
+                    @csrf
+                    <input class="btn btn-primary" type="submit" value="Записаться">
+                </form>
             @else
-            <form action="{{route('favorites.store', $event->id)}}" method="POST">
-                @csrf
-                <input class="btn btn-primary" type="submit" value="В избранное">
-            </form>
-
+                <button class="btn btn-delete" disabled>Мест нет</button>
             @endif
-            
-            
-            
-            <a href="{{route('event.edit', $event->id)}}" class="btn btn-edit">Редактировать</a>
-            <a href="{{route('event.delete', $event->id)}}" class="btn btn-delete">Удалить</a>
-            @endauth
-            
+
+            <a href="{{ route('event.edit', $event->id) }}" class="btn btn-edit">Редактировать</a>
+            <a href="{{ route('event.delete', $event->id) }}" class="btn btn-delete">Удалить</a>
+        </div>
+        @endauth
+
+        <div class="form-group">
+            <h3>Список записавшихся</h3>
+            @if($event->registrations->isNotEmpty())
+                <ul>
+                    @foreach($event->registrations as $registration)
+                        <li>
+                            <a href="{{ route('user.profile', $registration->user->id) }}">
+                                {{ $registration->user->username ?? $registration->user->email }}
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            @else
+                <p>Пока никто не записался.</p>
+            @endif
         </div>
     </div>
 </div>

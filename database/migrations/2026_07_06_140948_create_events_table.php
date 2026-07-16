@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('date');
             $table->string('place');
             $table->string('description');
+            $table->integer('min_entries')->default(0);
+            $table->integer('max_entries')->default(10);
             $table->string('image');
             $table->timestamps();
         });

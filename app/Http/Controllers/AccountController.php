@@ -58,8 +58,16 @@ class AccountController extends Controller
     }
 
     public function profile() {
-        $events = Auth::user()->favoriteEvents;
+        $events = Auth::user()->registeredEvents()->get();
         return view('pages.profile', compact('events'));
+    }
+
+    public function showUserProfile($id)
+    {
+        $user = User::findOrFail($id);
+        $events = $user->registeredEvents()->get();
+
+        return view('pages.user_profile', compact('user', 'events'));
     }
 
 }

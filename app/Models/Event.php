@@ -11,9 +11,14 @@ class Event extends Model
 
     protected $guarded = [];
 
-    public function favorites()
+    public function registrations()
     {
-        return $this->hasMany(Favorite::class);
+        return $this->hasMany(EventRegistration::class);
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'event_registrations');
     }
 
     public function getImagePathAttribute()
@@ -24,5 +29,15 @@ class Event extends Model
     public function getImageUrlAttribute()
     {
         return $this->image_path ? route('event.image', ['path' => $this->image_path]) : null;
+    }
+
+    public function getRegisteredCountAttribute()
+    {
+        return $this->registrations()->count();
+    }
+
+    public function getCapacityLabelAttribute()
+    {
+        return $this->registered_count . '/' . $this->max_entries;
     }
 }

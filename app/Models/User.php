@@ -44,17 +44,19 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function favorites(){
-        return $this->hasMany(Favorite::class);
-    }
-    
-    public function hasFavorited($eventId){
-        return $this->favorites()->where('event_id', $eventId)->exists();
-
+    public function registrations()
+    {
+        return $this->hasMany(EventRegistration::class);
     }
 
-    public function favoriteEvents(){
-        return $this->belongsToMany(Event::class, 'favorites');
+    public function hasRegistered($eventId)
+    {
+        return $this->registrations()->where('event_id', $eventId)->exists();
+    }
+
+    public function registeredEvents()
+    {
+        return $this->belongsToMany(Event::class, 'event_registrations');
     }
 
 }

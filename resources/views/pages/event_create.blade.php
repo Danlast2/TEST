@@ -39,6 +39,22 @@
         </div>
 
         <div class="form-group">
+            <label>Минимум записей</label>
+            <input type="number" name="min_entries" min="0" value="{{ old('min_entries', 0) }}">
+            @error('min_entries')
+                <span class="error">* {{ $message }}</span>
+            @enderror
+        </div>
+
+        <div class="form-group">
+            <label>Максимум записей</label>
+            <input type="number" name="max_entries" min="1" value="{{ old('max_entries', 10) }}">
+            @error('max_entries')
+                <span class="error">* {{ $message }}</span>
+            @enderror
+        </div>
+
+        <div class="form-group">
             <label>Афиша (jpg/webp, до 50kb)</label>
             <input type="file" name="image" accept=".jpg,.jpeg,.webp">
             @error('image')
