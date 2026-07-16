@@ -7,12 +7,13 @@
     <link rel="stylesheet" href="{{ asset('style.css') }}">
 </head>
 <body>
-    <div class="container">
+    <div class="page-wrap">
         @include('components.header')
-        @include('components.alert')
-        @yield('page')
+        <div class="container">
+            @include('components.alert')
+            @yield('page')
+        </div>
         @include('components.footer')
-
     </div>
 </body>
 </html>

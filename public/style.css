@@ -68,23 +68,35 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     background: var(--bg-container);
-    padding: 0 40px 48px;
     min-height: calc(100vh - 72px);
 }
 
 /* ===== ШАПКА ===== */
 .header {
+    width: 100%;
     background: var(--bg-dark);
-    padding: 0 40px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    min-height: 72px;
     border-bottom: 1px solid var(--bg-dark-2);
     position: sticky;
     top: 0;
     z-index: 100;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    will-change: transform, opacity;
+}
+
+.header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+    min-height: 72px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header.is-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
 }
 
 .logo {

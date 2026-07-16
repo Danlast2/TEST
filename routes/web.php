@@ -9,6 +9,20 @@ Route::get('/', [EventController::class, 'index'])->name('home');
 Route::get('/event-image/{path}', [EventController::class, 'image'])->where('path', '.*')->name('event.image');
 Route::get('/events/{id}', [EventController::class, 'show'])->name('event.show');
 
+Route::get('/club-index', function () { return view('pages.club_index'); })->name('club.index');
+Route::get('/club-profile', function () { return view('pages.club_profile'); })->name('club.profile');
+Route::get('/club-faq', function () { return view('pages.club_faq'); })->name('club.faq');
+Route::get('/event-index', function () { return view('pages.event_index'); })->name('event.index');
+Route::get('/admin-panel', function () { return view('pages.admin_panel'); })->name('admin.panel');
+Route::get('/moderator-panel', function () { return view('pages.moderator_panel'); })->name('moderator.panel');
+Route::get('/articles', function () { return view('pages.articles'); })->name('articles');
+Route::get('/author-faq', function () { return view('pages.author_faq'); })->name('author.faq');
+
+Route::get('/books-exchange', function () { return view('pages.books.exchange_index'); })->name('exchange.index');
+Route::get('/exchange-create', function () { return view('pages.books.exchange_create'); })->name('exchange.create');
+Route::get('/exchange-edit/{id}', function ($id) { return view('pages.books.exchange_edit', compact('id')); })->name('exchange.edit');
+Route::get('/exchange-show/{id}', function ($id) { return view('pages.books.exchange_show', compact('id')); })->name('exchange.show');
+Route::get('/exchange-delete/{id}', function ($id) { return view('pages.books.exchange_delete', compact('id')); })->name('exchange.delete');
 
 // ========== ГОСТЕВЫЕ МАРШРУТЫ (только для неавторизованных) ==========
 Route::middleware('guest')->group(function () {
