@@ -135,11 +135,14 @@ class ClubController extends Controller
         }
 
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'nullable|exists:users,id',
+            'email' => 'nullable|email|required_without:user_id|exists:users,email',
             'reason' => 'nullable|string|max:255',
         ]);
 
-        $targetUser = User::findOrFail($request->input('user_id'));
+        $targetUser = $request->filled('user_id')
+            ? User::findOrFail($request->input('user_id'))
+            : User::where('email', $request->input('email'))->firstOrFail();
 
         if ($targetUser->id === $club->id) {
             return back()->withErrors(['user_id' => 'Нельзя забанить самого клуба.']);
@@ -147,6 +150,7 @@ class ClubController extends Controller
 
         $targetUser->club_banned = true;
         $targetUser->club_ban_reason = $request->input('reason');
+        $targetUser->club_ban_club_id = $club->id;
         $targetUser->save();
 
         return back()->with('success', 'Пользователь забанен в клубе.');
@@ -161,11 +165,11 @@ class ClubController extends Controller
         }
 
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'email' => 'required|email|exists:users,email',
             'role' => 'required|in:club_moderator,user',
         ]);
 
-        $targetUser = User::findOrFail($request->input('user_id'));
+        $targetUser = User::where('email', $request->input('email'))->firstOrFail();
         $targetUser->role = $request->input('role');
         $targetUser->club_id = $club->id;
         $targetUser->save();

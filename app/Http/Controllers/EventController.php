@@ -7,6 +7,7 @@ use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class EventController extends Controller
 {
@@ -141,11 +142,11 @@ class EventController extends Controller
             abort(403);
         }
 
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'title'       => 'required|string|max:255',
             'date'        => 'required|date',
             'place'       => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string|max:2000',
             'tags'        => 'nullable|array',
             'tags.*'      => 'nullable|string|in:' . implode(',', array_map(static fn (EventTag $tag) => $tag->value, EventTag::cases())),
             'min_entries' => 'nullable|integer|min:0',
@@ -155,6 +156,15 @@ class EventController extends Controller
             'longitude'   => 'required|numeric|between:-180,180',
         ]);
 
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('error', 'Проверьте форму и заполните обязательные поля.');
+        }
+
+        $validated = $validator->validated();
+        $validated['description'] = $validated['description'] ?? '';
         $validated['tags'] = array_values(array_filter($validated['tags'] ?? []));
 
         if ($request->hasFile('image')) {
@@ -207,11 +217,11 @@ class EventController extends Controller
             abort(403);
         }
 
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'title'       => 'required|string|max:255',
             'date'        => 'required|date',
             'place'       => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string|max:2000',
             'tags'        => 'nullable|array',
             'tags.*'      => 'nullable|string|in:' . implode(',', array_map(static fn (EventTag $tag) => $tag->value, EventTag::cases())),
             'min_entries' => 'nullable|integer|min:0',
@@ -221,6 +231,15 @@ class EventController extends Controller
             'longitude'   => 'required|numeric|between:-180,180',
         ]);
 
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('error', 'Проверьте форму и заполните обязательные поля.');
+        }
+
+        $validated = $validator->validated();
+        $validated['description'] = $validated['description'] ?? '';
         $validated['tags'] = array_values(array_filter($validated['tags'] ?? []));
 
         if ($request->hasFile('image')) {

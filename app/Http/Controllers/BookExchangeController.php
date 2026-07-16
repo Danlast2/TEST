@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BookExchange;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class BookExchangeController extends Controller
 {
@@ -22,15 +23,25 @@ class BookExchangeController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string|max:2000',
             'place' => 'required|string|max:255',
             'date' => 'nullable|date',
             'contacts' => 'required|string|max:255',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
         ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('error', 'Проверьте форму и заполните обязательные поля.');
+        }
+
+        $validated = $validator->validated();
+        $validated['description'] = $validated['description'] ?? '';
 
         if ($request->filled('date')) {
             $validated['date'] = $request->input('date');
@@ -62,15 +73,25 @@ class BookExchangeController extends Controller
     {
         abort_unless($exchange->canBeManagedBy(Auth::user()), 403);
 
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'nullable|string|max:2000',
             'place' => 'required|string|max:255',
             'date' => 'nullable|date',
             'contacts' => 'required|string|max:255',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
         ]);
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('error', 'Проверьте форму и заполните обязательные поля.');
+        }
+
+        $validated = $validator->validated();
+        $validated['description'] = $validated['description'] ?? '';
 
         if ($request->filled('date')) {
             $validated['date'] = $request->input('date');

@@ -78,6 +78,24 @@ class User extends Authenticatable
             ->whereNotIn('id', $this->registeredEvents()->pluck('events.id'));
     }
 
+    public function canAccessClubContent($clubId): bool
+    {
+        if (! $clubId) {
+            return true;
+        }
+
+        if (! $this->club_banned) {
+            return true;
+        }
+
+        return ! ($this->club_ban_club_id && (int) $this->club_ban_club_id === (int) $clubId);
+    }
+
+    public function canParticipateInClubEvent($event): bool
+    {
+        return $this->canAccessClubContent($event->club_id);
+    }
+
     public function canManageEvent($event): bool
     {
         $role = $this->role;

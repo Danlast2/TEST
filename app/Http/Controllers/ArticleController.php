@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ArticleController extends Controller
 {
@@ -130,6 +131,12 @@ class ArticleController extends Controller
 
         if (! Auth::check()) {
             abort(403);
+        }
+
+        $user = Auth::user();
+
+        if (! $user->canAccessClubContent($article->club_id)) {
+            abort(403, 'Вы забанены в этом клубе и не можете оставлять комментарии под его статьями.');
         }
 
         Comment::create([

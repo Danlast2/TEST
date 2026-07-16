@@ -32,8 +32,8 @@
         <h3>Назначить роль пользователю</h3>
         <form action="{{ route('club.assignRole', $club->id) }}" method="POST" class="form-group">
             @csrf
-            <label>Пользователь</label>
-            <input type="number" name="user_id" placeholder="ID пользователя">
+            <label>Email пользователя</label>
+            <input type="email" name="email" placeholder="user@example.com">
             <label>Роль</label>
             <select name="role">
                 <option value="club_moderator">club_moderator</option>
@@ -45,8 +45,8 @@
         <h3>Забанить пользователя</h3>
         <form action="{{ route('club.ban', $club->id) }}" method="POST" class="form-group">
             @csrf
-            <label>Пользователь</label>
-            <input type="number" name="user_id" placeholder="ID пользователя">
+            <label>Email пользователя</label>
+            <input type="email" name="email" placeholder="user@example.com">
             <label>Причина</label>
             <input type="text" name="reason" placeholder="Причина бана">
             <input type="submit" class="btn btn-delete" value="Забанить">

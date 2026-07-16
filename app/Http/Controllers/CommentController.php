@@ -20,6 +20,12 @@ class CommentController extends Controller
             abort(403);
         }
 
+        $user = Auth::user();
+
+        if (! $user->canParticipateInClubEvent($event)) {
+            abort(403, 'Вы забанены в этом клубе и не можете оставлять комментарии под его мероприятиями.');
+        }
+
         Comment::create([
             'user_id' => Auth::id(),
             'event_id' => $event->id,
