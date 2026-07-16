@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('title');
             $table->string('date');
             $table->string('place');
+            $table->decimal('latitude', 10, 7);
+            $table->decimal('longitude', 10, 7);
             $table->string('description');
             $table->integer('min_entries')->default(0);
             $table->integer('max_entries')->default(10);

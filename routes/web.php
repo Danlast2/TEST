@@ -5,8 +5,15 @@ use App\Http\Controllers\ClubController;
 use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
 
+
+
 // ========== ПУБЛИЧНЫЕ МАРШРУТЫ ==========
 Route::get('/', [EventController::class, 'index'])->name('home');
+Route::get('/start', [EventController::class, 'start'])->name('start');
+
+Route::get('/api/events/map-data', [EventController::class, 'mapData'])->name('events.map'); 
+
+
 Route::get('/event-image/{path}', [EventController::class, 'image'])->where('path', '.*')->name('event.image');
 Route::get('/events/{id}', [EventController::class, 'show'])->name('event.show');
 Route::get('/users/{id}', [AccountController::class, 'showUserProfile'])->name('user.profile');

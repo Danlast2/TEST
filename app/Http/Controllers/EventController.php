@@ -44,6 +44,53 @@ class EventController extends Controller
         return view('pages.event_index', compact('events', 'query', 'dateFilter', 'sort'));
     }
 
+
+        public function start(Request $request)
+    {
+        $query = trim((string) $request->input('q', ''));
+        $dateFilter = $request->input('date_filter', 'all');
+        $sort = $request->input('sort', 'date');
+
+        $eventsQuery = Event::query()
+            ->when($query !== '', function ($q) use ($query) {
+                $q->where(function ($sub) use ($query) {
+                    $sub->where('title', 'like', '%' . $query . '%')
+                        ->orWhere('place', 'like', '%' . $query . '%')
+                        ->orWhere('description', 'like', '%' . $query . '%');
+                });
+            });
+
+        if ($dateFilter === 'upcoming') {
+            $eventsQuery->where('date', '>=', now());
+        } elseif ($dateFilter === 'past') {
+            $eventsQuery->where('date', '<', now());
+        }
+
+        if ($sort === 'popular') {
+            $eventsQuery->withCount('registrations')->orderByDesc('registrations_count');
+        } else {
+            $eventsQuery->orderBy('date');
+        }
+
+        $events = $eventsQuery->get();
+
+        // === ДАННЫЕ ДЛЯ КАРТЫ ===
+        $mapMarkers = $events->filter(function ($event) {
+            return $event->latitude && $event->longitude;
+        })->map(function ($event) {
+            return [
+                'id'        => $event->id,
+                'title'     => $event->title,
+                'latitude'  => $event->latitude,
+                'longitude' => $event->longitude,
+                'place'     => $event->place,
+                'date'      => $event->date,
+                'url'       => route('event.show', $event->id),
+            ];
+        })->values();
+
+        return view('pages.start', compact('events', 'query', 'dateFilter', 'sort', 'mapMarkers'));
+    }
     /**
      * Show the form for creating a new resource.
      */

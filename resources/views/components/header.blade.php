@@ -1,9 +1,9 @@
 <!-- ========== ХЕДЕР ========== -->
 <header class="header" id="site-header">
     <div class="header-inner">
-        <a href="/" class="logo">Книжный</a>
+        <a href="{{ route('start') }}" class="logo">Книжный</a>
         <div class="nav">
-            <a href="/">Главная</a>
+            <a href="{{ route('start') }}">Главная</a>
             <a href="{{ route('event.index') }}">Мероприятия</a>
             <a href="{{ route('club.index') }}">Клубы</a>
             <a href="{{ route('articles') }}">Статьи</a>
