@@ -13,6 +13,10 @@
         <p><strong>Минимум для проведения:</strong> {{ $event->min_entries ?? 0 }}</p>
         <p><strong>Записались:</strong> {{ $event->registered_count }}/{{ $event->max_entries }}</p>
 
+        @guest
+            <p>Чтобы записаться на мероприятие, пожалуйста, <a href="{{ route('login') }}">войдите</a></p>
+        @endguest
+
         @auth
         <div class="flex">
             @if(auth()->user()->hasRegistered($event->id))

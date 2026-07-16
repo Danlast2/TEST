@@ -117,13 +117,15 @@ class EventController extends Controller
         }
 
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'date' => 'required|date',
-            'place' => 'required|string|max:255',
+            'title'       => 'required|string|max:255',
+            'date'        => 'required|date',
+            'place'       => 'required|string|max:255',
             'description' => 'nullable|string',
             'min_entries' => 'nullable|integer|min:0',
             'max_entries' => 'nullable|integer|min:1',
-            'image' => 'required|image|mimes:jpg,jpeg,webp|max:50',
+            'image'       => 'nullable|image|mimes:jpg,jpeg,webp|max:50',
+            'latitude'    => 'required|numeric|between:-90,90',
+            'longitude'   => 'required|numeric|between:-180,180',
         ]);
 
         if ($request->hasFile('image')) {
@@ -177,14 +179,15 @@ class EventController extends Controller
         }
 
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'date' => 'required|date',
-            'place' => 'required|string|max:255',
+            'title'       => 'required|string|max:255',
+            'date'        => 'required|date',
+            'place'       => 'required|string|max:255',
             'description' => 'nullable|string',
             'min_entries' => 'nullable|integer|min:0',
             'max_entries' => 'nullable|integer|min:1',
-            // image делаем nullable, чтобы можно было сохранить изменения без новой картинки
-            'image' => 'nullable|image|mimes:jpg,jpeg,webp|max:50',
+            'image'       => 'nullable|image|mimes:jpg,jpeg,webp|max:50',
+            'latitude'    => 'required|numeric|between:-90,90',
+            'longitude'   => 'required|numeric|between:-180,180',
         ]);
 
         if ($request->hasFile('image')) {
