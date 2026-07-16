@@ -29,8 +29,10 @@
                 <button class="btn btn-delete" disabled>Мест нет</button>
             @endif
 
-            <a href="{{ route('event.edit', $event->id) }}" class="btn btn-edit">Редактировать</a>
-            <a href="{{ route('event.delete', $event->id) }}" class="btn btn-delete">Удалить</a>
+            @if(auth()->user()->canManageEvent($event))
+                <a href="{{ route('event.edit', $event->id) }}" class="btn btn-edit">Редактировать</a>
+                <a href="{{ route('event.delete', $event->id) }}" class="btn btn-delete">Удалить</a>
+            @endif
         </div>
         @endauth
 

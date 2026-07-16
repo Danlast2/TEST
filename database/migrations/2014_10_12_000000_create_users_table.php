@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', ['user', 'admin', 'moderator', 'club_admin', 'club_moderator', 'ban'])->default('user');
+            $table->enum('role', ['user', 'admin', 'moderator', 'club', 'club_admin', 'club_moderator', 'ban'])->default('user');
+            $table->unsignedBigInteger('club_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

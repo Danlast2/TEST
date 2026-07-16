@@ -4,37 +4,44 @@
 <section class="form-card">
     <h2>Все мероприятия</h2>
 
-    <div class="form-group">
+    <form method="GET" class="form-group">
         <label>Поиск мероприятия</label>
-        <input type="text" placeholder="Введите название или место">
-    </div>
+        <input type="text" name="q" value="{{ $query ?? '' }}" placeholder="Введите название или место">
+    </form>
 
-    <div class="form-group">
-        <label>Фильтр</label>
-        <select>
-            <option>Все типы</option>
-            <option>Встречи</option>
-            <option>Лекции</option>
-            <option>Обмены</option>
+    <form method="GET" class="form-group">
+        <label>Фильтр по дате</label>
+        <select name="date_filter">
+            <option value="all" {{ ($dateFilter ?? 'all') === 'all' ? 'selected' : '' }}>Все</option>
+            <option value="upcoming" {{ ($dateFilter ?? '') === 'upcoming' ? 'selected' : '' }}>Предстоящие</option>
+            <option value="past" {{ ($dateFilter ?? '') === 'past' ? 'selected' : '' }}>Прошедшие</option>
         </select>
-    </div>
+
+        <label>Сортировка</label>
+        <select name="sort">
+            <option value="date" {{ ($sort ?? 'date') === 'date' ? 'selected' : '' }}>По дате</option>
+            <option value="popular" {{ ($sort ?? '') === 'popular' ? 'selected' : '' }}>По популярности</option>
+        </select>
+
+        <input type="submit" class="btn btn-outline" value="Применить">
+    </form>
 
     <div class="object-grid">
-        <div class="card">
-            <div class="card-content">
-                <h3 class="card-title">Книжная встреча</h3>
-                <p>Дата: 20 июля · Москва</p>
-                <a href="{{ route('event.show', 1) }}" class="btn btn-outline">Подробнее</a>
+        @forelse($events as $event)
+            <div class="card">
+                <div class="card-img">
+                    <img src="{{ $event->image_url }}" alt="{{ $event->title }}" height="100%" width="100%">
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">{{ $event->title }}</h3>
+                    <p>Дата: {{ $event->date }} · {{ $event->place }}</p>
+                    <p>Записалось: {{ $event->registered_count }}</p>
+                    <a href="{{ route('event.show', $event->id) }}" class="btn btn-outline">Подробнее</a>
+                </div>
             </div>
-        </div>
-
-        <div class="card">
-            <div class="card-content">
-                <h3 class="card-title">Лекция по современной литературе</h3>
-                <p>Дата: 25 июля · Казань</p>
-                <a href="{{ route('event.show', 2) }}" class="btn btn-outline">Подробнее</a>
-            </div>
-        </div>
+        @empty
+            <p>Мероприятий не найдено.</p>
+        @endforelse
     </div>
 </section>
 @endsection

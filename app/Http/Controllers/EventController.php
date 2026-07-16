@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
@@ -11,10 +12,36 @@ class EventController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $events = Event::all();
-        return view('pages.start', compact('events'));
+        $query = trim((string) $request->input('q', ''));
+        $dateFilter = $request->input('date_filter', 'all');
+        $sort = $request->input('sort', 'date');
+
+        $eventsQuery = Event::query()
+            ->when($query !== '', function ($q) use ($query) {
+                $q->where(function ($sub) use ($query) {
+                    $sub->where('title', 'like', '%' . $query . '%')
+                        ->orWhere('place', 'like', '%' . $query . '%')
+                        ->orWhere('description', 'like', '%' . $query . '%');
+                });
+            });
+
+        if ($dateFilter === 'upcoming') {
+            $eventsQuery->where('date', '>=', now());
+        } elseif ($dateFilter === 'past') {
+            $eventsQuery->where('date', '<', now());
+        }
+
+        if ($sort === 'popular') {
+            $eventsQuery->withCount('registrations')->orderByDesc('registrations_count');
+        } else {
+            $eventsQuery->orderBy('date');
+        }
+
+        $events = $eventsQuery->get();
+
+        return view('pages.event_index', compact('events', 'query', 'dateFilter', 'sort'));
     }
 
     /**
@@ -22,6 +49,12 @@ class EventController extends Controller
      */
     public function create()
     {
+        $user = Auth::user();
+
+        if (! $user || ! $user->canCreateEvents()) {
+            abort(403);
+        }
+
         return view('pages.event_create');
     }
 
@@ -30,6 +63,12 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+
+        if (! $user || ! $user->canCreateEvents()) {
+            abort(403);
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'date' => 'required|date',
@@ -43,6 +82,12 @@ class EventController extends Controller
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('events', 'public');
             $validated['image'] = ltrim($path, '/');
+        }
+
+        $user = auth()->user();
+        if ($user && in_array($user->role, ['club', 'club_admin', 'club_moderator'], true)) {
+            $validated['club_id'] = $user->club_id ?? $user->id;
+            $validated['author_id'] = $user->id;
         }
 
         Event::create($validated);
@@ -65,6 +110,11 @@ class EventController extends Controller
     public function edit($id)
     {
         $event = Event::findOrFail($id);
+
+        if (! Auth::user() || ! Auth::user()->canManageEvent($event)) {
+            abort(403);
+        }
+
         return view('pages.event_edit', compact('event'));
     }
 
@@ -74,6 +124,10 @@ class EventController extends Controller
     public function update(Request $request, $id)
     {
         $event = Event::findOrFail($id);
+
+        if (! Auth::user() || ! Auth::user()->canManageEvent($event)) {
+            abort(403);
+        }
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -97,6 +151,12 @@ class EventController extends Controller
             $validated['image'] = $event->image;
         }
 
+        $user = auth()->user();
+        if ($user && in_array($user->role, ['club', 'club_admin', 'club_moderator'], true)) {
+            $validated['club_id'] = $user->club_id ?? $user->id;
+            $validated['author_id'] = $user->id;
+        }
+
         $event->update($validated);
 
         return redirect()->route('event.show', $event->id)->with('success', 'Мероприятие обновлено!');
@@ -115,6 +175,11 @@ class EventController extends Controller
 
     public function delete($id){
         $event = Event::findOrFail($id);
+
+        if (! Auth::user() || ! Auth::user()->canManageEvent($event)) {
+            abort(403);
+        }
+
         return view('pages.event_delete', compact('event'));
     }
 
@@ -123,7 +188,10 @@ class EventController extends Controller
     {
         $event = Event::findOrFail($id);
 
-       
+        if (! Auth::user() || ! Auth::user()->canManageEvent($event)) {
+            abort(403);
+        }
+
         $event->delete();
 
         return redirect('/')->with('success', 'Мероприятие удалено');

@@ -4,6 +4,10 @@
         <a href="/" class="logo">Книжный</a>
         <div class="nav">
             <a href="/">Главная</a>
+            <a href="{{ route('event.index') }}">Мероприятия</a>
+            <a href="{{ route('club.index') }}">Клубы</a>
+            <a href="{{ route('articles') }}">Статьи</a>
+            <a href="{{ route('exchange.index') }}">Обмен</a>
 
             @guest
                 <a href="{{ route('show.reg') }}">Регистрация</a>
@@ -11,10 +15,15 @@
             @endguest
 
             @auth
-                <a href="{{route('profile')}}">Профиль</a>
+                @if(auth()->user()->role === 'club')
+                    <a href="{{ route('club.profile', auth()->user()->id) }}">Профиль</a>
+                @else
+                    <a href="{{ route('profile') }}">Профиль</a>
+                @endif
 
-                @if(auth()->user()->role === 'admin')
-                    <a href="{{ route('event.create') }}">Добавить</a>
+
+                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'club' || auth()->user()->role === 'club_moderator')
+                    <a href="{{ route('event.create') }}">Добавить мероприятие</a>
                 @endif
 
                 <form action="{{ route('logout') }}" method="POST" style="display: inline;">

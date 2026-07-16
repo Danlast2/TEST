@@ -2,43 +2,93 @@
 
 @section('page')
 <section class="form-card">
-    <h2>Профиль книжного клуба</h2>
+    <h2>{{ $club->username }}</h2>
+    <p><strong>Email:</strong> {{ $club->email }}</p>
 
-    <div class="detail-card">
-        <div class="detail-img">
-            <img src="https://via.placeholder.com/320x220?text=Club+Avatar" alt="Аватар клуба" height="100%" width="100%">
+    @auth
+        @if(auth()->user()->id !== $club->id)
+            @if(auth()->user()->club_id === $club->id)
+                <form action="{{ route('club.leave', $club->id) }}" method="POST" class="flex">
+                    @csrf
+                    <input type="submit" class="btn btn-delete" value="Отписаться">
+                </form>
+            @else
+                <form action="{{ route('club.join', $club->id) }}" method="POST" class="flex">
+                    @csrf
+                    <input type="submit" class="btn btn-primary" value="Присоединиться">
+                </form>
+            @endif
+        @endif
+    @endauth
+
+    @if(auth()->user() && auth()->user()->canManageClub($club))
+        <hr>
+        <h3>Управление клубом</h3>
+        <div class="flex">
+            <a href="{{ route('event.create') }}" class="btn btn-primary">Создать мероприятие</a>
+            <a href="{{ route('club.edit', $club->id) }}" class="btn btn-edit">Редактировать профиль клуба</a>
         </div>
-        <div class="detail-content">
-            <h3>Название клуба</h3>
-            <p><strong>Описание:</strong> Книжный клуб для любителей литературы, обсуждений и совместных встреч.</p>
-            <p><strong>Контакты:</strong> club@example.com · +7 (999) 000-00-00</p>
 
-            <div class="flex">
-                <a href="#" class="btn btn-primary">Написать</a>
-                <a href="#" class="btn btn-edit">Подписаться</a>
-            </div>
-        </div>
-    </div>
+        <h3>Назначить роль пользователю</h3>
+        <form action="{{ route('club.assignRole', $club->id) }}" method="POST" class="form-group">
+            @csrf
+            <label>Пользователь</label>
+            <input type="number" name="user_id" placeholder="ID пользователя">
+            <label>Роль</label>
+            <select name="role">
+                <option value="club_moderator">club_moderator</option>
+                <option value="user">user</option>
+            </select>
+            <input type="submit" class="btn btn-primary" value="Назначить">
+        </form>
 
-    <div class="form-group">
-        <h3>Список мероприятий клуба</h3>
+        <h3>Забанить пользователя</h3>
+        <form action="{{ route('club.ban', $club->id) }}" method="POST" class="form-group">
+            @csrf
+            <label>Пользователь</label>
+            <input type="number" name="user_id" placeholder="ID пользователя">
+            <label>Причина</label>
+            <input type="text" name="reason" placeholder="Причина бана">
+            <input type="submit" class="btn btn-delete" value="Забанить">
+        </form>
+    @endif
+
+    <hr>
+    <h3>Участники клуба</h3>
+    <form method="GET" class="form-group">
+        <input type="text" name="member" value="{{ $query ?? '' }}" placeholder="Поиск участника">
+        <input type="submit" class="btn btn-outline" value="Найти">
+    </form>
+
+    @if($members->isNotEmpty())
         <ul>
-            <li>Мастер-класс по чтению вслух — 20 июля</li>
-            <li>Обсуждение романа «1984» — 25 июля</li>
-            <li>Книжная ярмарка — 30 июля</li>
+            @foreach($members as $member)
+                <li>
+                    <a href="{{ route('user.profile', $member->id) }}">{{ $member->username }}</a>
+                    @if(auth()->user() && auth()->user()->canManageClub($club) && auth()->user()->id !== $member->id)
+                        <form action="{{ route('club.ban', $club->id) }}" method="POST" style="display:inline; margin-left:10px;">
+                            @csrf
+                            <input type="hidden" name="user_id" value="{{ $member->id }}">
+                            <input type="submit" class="btn btn-delete" value="Забанить">
+                        </form>
+                    @endif
+                </li>
+            @endforeach
         </ul>
-    </div>
+    @else
+        <p>Участников пока нет.</p>
+    @endif
 
-    <div class="form-group">
-        <h3>Отзывы</h3>
-        <p>«Очень уютное пространство для обсуждений»</p>
-        <p>«Много интересных встреч и полезных рекомендаций»</p>
-    </div>
-
-    <div class="form-group">
-        <h3>Модераторы</h3>
-        <p>Анна Иванова</p>
-        <p>Сергей Петров</p>
-    </div>
+    <hr>
+    <h3>Мероприятия клуба</h3>
+    @if($events->isNotEmpty())
+        <ul>
+            @foreach($events as $event)
+                <li><a href="{{ route('event.show', $event->id) }}">{{ $event->title }}</a></li>
+            @endforeach
+        </ul>
+    @else
+        <p>Мероприятий пока нет.</p>
+    @endif
 </section>
 @endsection

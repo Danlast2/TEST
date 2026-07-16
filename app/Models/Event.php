@@ -21,6 +21,16 @@ class Event extends Model
         return $this->belongsToMany(User::class, 'event_registrations');
     }
 
+    public function club()
+    {
+        return $this->belongsTo(User::class, 'club_id');
+    }
+
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'author_id');
+    }
+
     public function getImagePathAttribute()
     {
         return $this->image ? ltrim($this->image, '/') : null;

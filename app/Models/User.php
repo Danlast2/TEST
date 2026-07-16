@@ -59,4 +59,43 @@ class User extends Authenticatable
         return $this->belongsToMany(Event::class, 'event_registrations');
     }
 
+    public function canManageEvent($event): bool
+    {
+        $role = $this->role;
+
+        if (in_array($role, ['admin', 'moderator'], true)) {
+            return true;
+        }
+
+        if ($role === 'club') {
+            return $event->club_id && (int) $event->club_id === (int) $this->id;
+        }
+
+        if ($role === 'club_moderator') {
+            return $event->club_id && (int) $event->club_id === (int) $this->club_id;
+        }
+
+        return false;
+    }
+
+    public function canCreateEvents(): bool
+    {
+        return in_array($this->role, ['admin', 'moderator', 'club', 'club_moderator'], true);
+    }
+
+    public function canManageClub($club): bool
+    {
+        if ($this->role === 'admin') {
+            return true;
+        }
+
+        if ($this->role === 'club' && $this->id === $club->id) {
+            return true;
+        }
+
+        return $this->role === 'club_moderator'
+            && $this->club_id
+            && (int) $this->club_id === (int) $club->id;
+    }
+
 }
